@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     background-color: #2C3E50;
@@ -154,4 +155,111 @@ button:hover {
 .guess-item {
     padding: 2px 0;
     color: #ECF0F1;
+=======
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #2C3E50;
+    color: #ECF0F1;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #34495E;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #E74C3C;
+    margin-bottom: 20px;
+}
+
+.instructions {
+    background-color: #2C3E50;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.instructions ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.game-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    font-size: 18px;
+    width: 120px;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    background-color: #ECF0F1;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #3498DB;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980B9;
+}
+
+#new-game {
+    background-color: #2ECC71;
+}
+
+#new-game:hover {
+    background-color: #27AE60;
+}
+
+.status {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.history {
+    background-color: #2C3E50;
+    padding: 15px;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.history-item {
+    padding: 8px;
+    border-bottom: 1px solid #34495E;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.win-message {
+    color: #2ECC71;
+    font-weight: bold;
+}
+
+.lose-message {
+    color: #E74C3C;
+    font-weight: bold;
+>>>>>>> 94a51f86a8bb961858796e0d448bca821c7898ad
 } 
