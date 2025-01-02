@@ -1,4 +1,6 @@
 __pycache__/
 *.pyc
 .env
-game_history.json 
+game_history.json
+backup/
+backup_clean/
