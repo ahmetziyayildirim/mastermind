@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,42 +41,4 @@
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Mastermind</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>Number Mastermind</h1>
-        <div class="instructions">
-            <p>Guess the 4-digit number. After each guess, you'll get feedback:</p>
-            <ul>
-                <li><strong>+n</strong>: n digits correct and in right position</li>
-                <li><strong>-n</strong>: n digits correct but in wrong position</li>
-                <li><strong>0</strong>: no correct digits</li>
-            </ul>
-        </div>
-        
-        <div class="game-controls">
-            <input type="text" id="guess-input" maxlength="4" placeholder="Enter 4 digits">
-            <button id="submit-guess">Submit Guess</button>
-            <button id="new-game">New Game</button>
-        </div>
-        
-        <div class="status">
-            <p>Attempts: <span id="attempts">0</span>/10</p>
-        </div>
-        
-        <div class="history" id="history">
-            <!-- Game history will be added here -->
-        </div>
-    </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
->>>>>>> 94a51f86a8bb961858796e0d448bca821c7898ad
 </html> 
