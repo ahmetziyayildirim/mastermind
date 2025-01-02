@@ -160,7 +160,8 @@ def new_game():
         'attempts': 0,
         'max_attempts': 10,
         'history': [],
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M')
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M'),
+        'start_time': datetime.now().timestamp()
     }
     
     games[game_id] = game
@@ -228,12 +229,16 @@ def make_guess():
     game['history'].append(result)
     
     if result['game_over']:
+        end_time = datetime.now().timestamp()
+        elapsed_time = int(end_time - game['start_time'])  # Time in seconds
+        
         game_summary = {
             'attempts': game['attempts'],
             'won': result['won'],
             'secret_code': ''.join(map(str, game['secret_code'])),
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M'),
-            'guesses': game['guesses']
+            'guesses': game['guesses'],
+            'elapsed_time': elapsed_time
         }
         
         # Add new game to history and keep only last 5

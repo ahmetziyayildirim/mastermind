@@ -1,6 +1,8 @@
 let gameId = null;
 let lastGames = [];
 let playerNickname = '';
+let timerInterval = null;
+let startTime = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Show nickname modal first
@@ -72,6 +74,9 @@ async function startNewGame() {
         document.querySelectorAll('.number-item').forEach(item => {
             item.classList.remove('used', 'possible');
         });
+
+        // Reset and start timer
+        startTimer();
     } catch (error) {
         console.error('Error starting new game:', error);
     }
@@ -94,11 +99,14 @@ function updateLastGamesDisplay() {
         const resultClass = game.won ? 'win-message' : 'lose-message';
         item.classList.add(resultClass);
         
-        // Create game summary
+        const minutes = Math.floor(game.elapsed_time / 60);
+        const seconds = game.elapsed_time % 60;
+        const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
         let html = `
             ${resultEmoji} in ${game.attempts} attempts
             <br>
-            <small>Code: ${game.secret_code} | ${game.timestamp}</small>
+            <small>Time: ${timeStr} | Code: ${game.secret_code} | ${game.timestamp}</small>
         `;
         
         // Add guess history if available
@@ -145,8 +153,10 @@ async function submitGuess() {
             guessInput.value = '';
             
             if (data.game_over) {
+                stopTimer();
                 if (data.won) {
-                    alert(`Congratulations! You won in ${data.attempt} attempts!`);
+                    const timeStr = document.getElementById('timer').textContent;
+                    alert(`Congratulations! You won in ${data.attempt} attempts!\nTime: ${timeStr}`);
                 } else {
                     alert(`Game Over! The secret code was ${data.secret_code}`);
                 }
@@ -198,6 +208,10 @@ function updateHallOfFame(hallOfFame) {
         const position = index + 1;
         const medal = position <= 3 ? ['🥇', '🥈', '🥉'][index] : `${position}.`;
         
+        const minutes = Math.floor(record.elapsed_time / 60);
+        const seconds = record.elapsed_time % 60;
+        const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
         item.innerHTML = `
             <span class="fame-position">${medal}</span>
             <div>
@@ -205,7 +219,7 @@ function updateHallOfFame(hallOfFame) {
                 <br>
                 Won in ${record.attempts} attempts
                 <span class="fame-details">
-                    Code: ${record.secret_code} | ${record.timestamp}
+                    Time: ${timeStr} | Code: ${record.secret_code} | ${record.timestamp}
                 </span>
             </div>
         `;
@@ -258,4 +272,31 @@ async function setNickname() {
 function updateWelcomeMessage(nickname) {
     const welcomeMessage = document.getElementById('welcome-message');
     welcomeMessage.innerHTML = `Welcome <strong>${nickname}</strong>!`;
+}
+
+// Add timer functions
+function startTimer() {
+    startTime = new Date();
+    if (timerInterval) clearInterval(timerInterval);
+    
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+    if (!startTime) return;
+    
+    const currentTime = new Date();
+    const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+    const minutes = Math.floor(elapsedSeconds / 60);
+    const seconds = elapsedSeconds % 60;
+    
+    document.getElementById('timer').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
 } 
