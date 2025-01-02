@@ -7,35 +7,72 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div id="nickname-modal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome to Mastermind!</h2>
+            <p>Please enter your nickname:</p>
+            <input type="text" id="nickname-input" maxlength="20" placeholder="Your nickname">
+            <button id="start-playing">Start Playing</button>
+            <p id="nickname-error" class="error-message"></p>
+        </div>
+    </div>
     <div class="container">
-        <h1>Number Mastermind</h1>
-        <div class="instructions">
-            <p>Guess the 4-digit number. After each guess, you'll get feedback:</p>
-            <ul>
-                <li><strong>+n</strong>: n digits correct and in right position</li>
-                <li><strong>-n</strong>: n digits correct but in wrong position</li>
-                <li><strong>0</strong>: no correct digits</li>
-            </ul>
+        <div class="number-checker">
+            <div class="welcome-message" id="welcome-message">
+                <!-- Welcome message will be added here -->
+            </div>
+            <h2>Number Checker</h2>
+            <div class="number-grid">
+                <div class="number-item" data-number="0">0</div>
+                <div class="number-item" data-number="1">1</div>
+                <div class="number-item" data-number="2">2</div>
+                <div class="number-item" data-number="3">3</div>
+                <div class="number-item" data-number="4">4</div>
+                <div class="number-item" data-number="5">5</div>
+                <div class="number-item" data-number="6">6</div>
+                <div class="number-item" data-number="7">7</div>
+                <div class="number-item" data-number="8">8</div>
+                <div class="number-item" data-number="9">9</div>
+            </div>
+            <button id="reset-checker">Reset Checker</button>
+        </div>
+        <div class="game-container">
+            <h1>Number Mastermind</h1>
+            <div class="instructions">
+                <p>Guess the 4-digit number. After each guess, you'll get feedback:</p>
+                <ul>
+                    <li><strong>+n</strong>: n digits correct and in right position</li>
+                    <li><strong>-n</strong>: n digits correct but in wrong position</li>
+                    <li><strong>0</strong>: no correct digits</li>
+                </ul>
+            </div>
+            
+            <div class="game-controls">
+                <input type="text" id="guess-input" maxlength="4" placeholder="Enter 4 digits">
+                <button id="submit-guess">Submit Guess</button>
+                <button id="new-game">New Game</button>
+            </div>
+            
+            <div class="status">
+                <p>Attempts: <span id="attempts">0</span>/10</p>
+            </div>
+            
+            <div class="history" id="history">
+                <!-- Game history will be added here -->
+            </div>
+            
+            <div class="last-games">
+                <h2>Last Games</h2>
+                <div id="last-games-list">
+                    <!-- Last games will be added here -->
+                </div>
+            </div>
         </div>
         
-        <div class="game-controls">
-            <input type="text" id="guess-input" maxlength="4" placeholder="Enter 4 digits">
-            <button id="submit-guess">Submit Guess</button>
-            <button id="new-game">New Game</button>
-        </div>
-        
-        <div class="status">
-            <p>Attempts: <span id="attempts">0</span>/10</p>
-        </div>
-        
-        <div class="history" id="history">
-            <!-- Game history will be added here -->
-        </div>
-        
-        <div class="last-games">
-            <h2>Last Games</h2>
-            <div id="last-games-list">
-                <!-- Last games will be added here -->
+        <div class="hall-of-fame">
+            <h2>Hall of Fame 🏆</h2>
+            <div id="hall-of-fame-list">
+                <!-- Hall of fame entries will be added here -->
             </div>
         </div>
     </div>

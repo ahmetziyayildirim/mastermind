@@ -1,7 +1,11 @@
 let gameId = null;
 let lastGames = [];
+let playerNickname = '';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Show nickname modal first
+    showNicknameModal();
+    
     startNewGame();
     
     document.getElementById('guess-input').addEventListener('keypress', (e) => {
@@ -12,6 +16,35 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('submit-guess').addEventListener('click', submitGuess);
     document.getElementById('new-game').addEventListener('click', startNewGame);
+
+    // Add number checker functionality
+    document.querySelectorAll('.number-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (item.classList.contains('used')) {
+                item.classList.remove('used');
+                item.classList.add('possible');
+            } else if (item.classList.contains('possible')) {
+                item.classList.remove('possible');
+            } else {
+                item.classList.add('used');
+            }
+        });
+    });
+
+    // Reset checker button
+    document.getElementById('reset-checker').addEventListener('click', () => {
+        document.querySelectorAll('.number-item').forEach(item => {
+            item.classList.remove('used', 'possible');
+        });
+    });
+
+    // Add nickname modal handler
+    document.getElementById('start-playing').addEventListener('click', setNickname);
+    document.getElementById('nickname-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            setNickname();
+        }
+    });
 });
 
 async function startNewGame() {
@@ -21,7 +54,7 @@ async function startNewGame() {
         });
         const data = await response.json();
         gameId = data.game_id;
-        lastGames = data.last_games || [];  // Ensure lastGames is initialized
+        lastGames = data.last_games || [];
         
         // Reset UI
         document.getElementById('history').innerHTML = '';
@@ -29,8 +62,16 @@ async function startNewGame() {
         document.getElementById('guess-input').value = '';
         document.getElementById('guess-input').focus();
         
-        // Update last games display immediately
+        // Update displays
         updateLastGamesDisplay();
+        if (data.hall_of_fame) {
+            updateHallOfFame(data.hall_of_fame);
+        }
+
+        // Reset number checker
+        document.querySelectorAll('.number-item').forEach(item => {
+            item.classList.remove('used', 'possible');
+        });
     } catch (error) {
         console.error('Error starting new game:', error);
     }
@@ -111,6 +152,10 @@ async function submitGuess() {
                 }
                 await startNewGame();
             }
+            
+            if (data.hall_of_fame) {
+                updateHallOfFame(data.hall_of_fame);
+            }
         } else {
             if (data.error === 'No active game. Please start a new game.') {
                 await startNewGame();
@@ -135,4 +180,82 @@ function updateHistory(result) {
     
     item.textContent = `Guess #${result.attempt}: ${result.guess} → ${result.feedback}`;
     history.insertBefore(item, history.firstChild);
+}
+
+function updateHallOfFame(hallOfFame) {
+    const hallOfFameList = document.getElementById('hall-of-fame-list');
+    hallOfFameList.innerHTML = '';
+    
+    if (!hallOfFame || hallOfFame.length === 0) {
+        hallOfFameList.innerHTML = '<div class="fame-item">No records yet</div>';
+        return;
+    }
+    
+    hallOfFame.forEach((record, index) => {
+        const item = document.createElement('div');
+        item.className = 'fame-item';
+        
+        const position = index + 1;
+        const medal = position <= 3 ? ['🥇', '🥈', '🥉'][index] : `${position}.`;
+        
+        item.innerHTML = `
+            <span class="fame-position">${medal}</span>
+            <div>
+                <strong>${record.player}</strong>
+                <br>
+                Won in ${record.attempts} attempts
+                <span class="fame-details">
+                    Code: ${record.secret_code} | ${record.timestamp}
+                </span>
+            </div>
+        `;
+        
+        hallOfFameList.appendChild(item);
+    });
+}
+
+function showNicknameModal() {
+    const modal = document.getElementById('nickname-modal');
+    modal.classList.add('active');
+    document.getElementById('nickname-input').focus();
+}
+
+async function setNickname() {
+    const nicknameInput = document.getElementById('nickname-input');
+    const nickname = nicknameInput.value.trim();
+    const errorElement = document.getElementById('nickname-error');
+    
+    if (!nickname) {
+        errorElement.textContent = 'Please enter a nickname';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/set-nickname', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nickname })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            playerNickname = nickname;
+            document.getElementById('nickname-modal').classList.remove('active');
+            updateWelcomeMessage(nickname);
+            startNewGame();
+        } else {
+            errorElement.textContent = data.error || 'An error occurred';
+        }
+    } catch (error) {
+        errorElement.textContent = 'An error occurred. Please try again.';
+    }
+}
+
+// Add this function to update welcome message
+function updateWelcomeMessage(nickname) {
+    const welcomeMessage = document.getElementById('welcome-message');
+    welcomeMessage.innerHTML = `Welcome <strong>${nickname}</strong>!`;
 } 

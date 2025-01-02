@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import os
 from werkzeug.middleware.proxy_fix import ProxyFix
 import json
+from operator import itemgetter
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Change this to a random secret key
@@ -12,6 +13,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # Store game states
 games = {}
 game_history = []  # Initialize as empty list
+hall_of_fame = []  # Initialize hall of fame list
 
 # Load history on startup
 try:
@@ -22,6 +24,14 @@ try:
                 game_history = []
 except:
     game_history = []
+
+# Load hall of fame on startup (add after game_history loading)
+try:
+    if os.path.exists('hall_of_fame.json'):
+        with open('hall_of_fame.json', 'r') as f:
+            hall_of_fame = json.load(f)
+except:
+    hall_of_fame = []
 
 def save_history():
     try:
@@ -103,6 +113,32 @@ def cleanup_history():
         game_history = game_history[:5]
         save_history()
 
+# Add this function to manage hall of fame
+def update_hall_of_fame(game_summary):
+    """Update hall of fame with best games"""
+    global hall_of_fame
+    if game_summary['won']:
+        fame_entry = {
+            'attempts': game_summary['attempts'],
+            'secret_code': game_summary['secret_code'],
+            'timestamp': game_summary['timestamp'],
+            'player': session.get('nickname', 'Anonymous')  # Use nickname from session
+        }
+        hall_of_fame.append(fame_entry)
+        # Sort by attempts (ascending) and timestamp (descending)
+        hall_of_fame.sort(key=lambda x: (x['attempts'], -datetime.strptime(x['timestamp'], '%Y-%m-%d %H:%M').timestamp()))
+        # Keep only top 10
+        hall_of_fame = hall_of_fame[:10]
+        save_hall_of_fame()
+
+def save_hall_of_fame():
+    """Save hall of fame to a file"""
+    try:
+        with open('hall_of_fame.json', 'w') as f:
+            json.dump(hall_of_fame, f)
+    except Exception as e:
+        print(f"Error saving hall of fame: {e}")
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -132,7 +168,8 @@ def new_game():
     
     return jsonify({
         'game_id': game_id,
-        'last_games': game_history[:5]  # Always return only last 5 games
+        'last_games': game_history[:5],  # Always return only last 5 games
+        'hall_of_fame': hall_of_fame  # Add this line
     })
 
 @app.route('/guess', methods=['POST'])
@@ -207,8 +244,25 @@ def make_guess():
         del games[game_id]
         
         result['last_games'] = game_history
+        
+        if result['game_over'] and result['won']:
+            update_hall_of_fame(game_summary)
+            result['hall_of_fame'] = hall_of_fame
     
     return jsonify(result)
+
+@app.route('/set-nickname', methods=['POST'])
+def set_nickname():
+    data = request.get_json()
+    nickname = data.get('nickname', '').strip()
+    
+    if not nickname:
+        return jsonify({'error': 'Nickname cannot be empty'}), 400
+    if len(nickname) > 20:
+        return jsonify({'error': 'Nickname too long (max 20 characters)'}), 400
+    
+    session['nickname'] = nickname
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
